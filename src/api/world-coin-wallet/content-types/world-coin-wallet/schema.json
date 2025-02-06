@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "world_coin_wallets",
+  "info": {
+    "singularName": "world-coin-wallet",
+    "pluralName": "world-coin-wallets",
+    "displayName": "WorldCoinWallet",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CarteraIdx": {
+      "type": "string"
+    },
+    "ammount": {
+      "type": "decimal"
+    },
+    "user_idd": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    },
+    "genesis": {
+      "type": "boolean"
+    },
+    "user_id": {
+      "type": "email"
+    }
+  }
+}

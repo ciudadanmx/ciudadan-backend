@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "driver_locations",
+  "info": {
+    "singularName": "driver-location",
+    "pluralName": "driver-locations",
+    "displayName": "DriverLocations",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "coords": {
+      "type": "json"
+    },
+    "driver_id": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "time": {
+      "type": "datetime"
+    }
+  }
+}

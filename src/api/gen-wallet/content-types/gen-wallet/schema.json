@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "gen_wallets",
+  "info": {
+    "singularName": "gen-wallet",
+    "pluralName": "gen-wallets",
+    "displayName": "GenWallet",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "WalletIdx": {
+      "type": "string"
+    },
+    "Coin": {
+      "type": "string"
+    }
+  }
+}

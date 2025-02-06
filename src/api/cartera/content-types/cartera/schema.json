@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "carteras",
+  "info": {
+    "singularName": "cartera",
+    "pluralName": "carteras",
+    "displayName": "Cartera",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "laborysGanados": {
+      "type": "decimal"
+    },
+    "laborysSaldo": {
+      "type": "decimal"
+    },
+    "ciudadanTokens": {
+      "type": "decimal"
+    },
+    "ciudadanRendimientos": {
+      "type": "decimal"
+    },
+    "user_id": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    }
+  }
+}
