@@ -72,7 +72,7 @@ module.exports = {
 
       const driverRoutes = await Promise.all(drivers.map(async (driver) => {
         let driverCoords;
-
+      
         try {
           driverCoords = JSON.parse(driver.coords);
         } catch (err) {
@@ -85,19 +85,24 @@ module.exports = {
             error: "Error parseando coordenadas",
           };
         }
-
-        const waypoints = `${origin.lat},${origin.lng}`;
-        const waypointsFormatted = Array.isArray(waypoints) 
-          ? waypoints.map(point => `${point.lat},${point.lng}`).join('|') 
-          : `${origin.lat},${origin.lng}`;
-
-        // URL para llamar a la API de Directions de Google Maps con los parámetros necesarios
-        const gmapsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&waypoints=${waypointsFormatted}&mode=driving&key=${GOOGLE_MAPS_API_KEY}`;
-
+      
+        // Usamos la ubicación del taxista como punto de partida
+        const startCoords = `${driverCoords.lat},${driverCoords.lng}`;
+        // El waypoint es el punto de recogida (origin)
+        const waypoint = `${origin.lat},${origin.lng}`;
+        // La ubicación de destino permanece igual
+        const destinationCoords = `${destination.lat},${destination.lng}`;
+      
+        // Construimos la URL para la API de Directions usando:
+        // - origen: la ubicación del taxista (startCoords)
+        // - waypoint: el punto de recogida (origin)
+        // - destino: destinationCoords
+        const gmapsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords}&destination=${destinationCoords}&waypoints=${waypoint}&mode=driving&key=${GOOGLE_MAPS_API_KEY}`;
+      
         try {
           const response = await axios.get(gmapsUrl);
           const routeData = response.data;
-
+      
           // Verificamos que haya rutas
           if (!routeData.routes || routeData.routes.length === 0) {
             console.log(`⚠️ No se encontró ruta para el conductor ${driver.id}`);
@@ -110,23 +115,26 @@ module.exports = {
               error: "No se encontró una ruta válida",
             };
           }
-
-          // Aquí estamos tomando la primera ruta y sus tramos
-          const route = routeData.routes[0];  // Primera ruta encontrada
-          const totalDistance = route.legs.reduce((acc, leg) => acc + leg.distance.value, 0);  // Distancia total de la ruta
-          const totalTime = route.legs.reduce((acc, leg) => acc + leg.duration.value, 0);  // Tiempo total de la ruta (en segundos)
-
-          // Para mostrar la ruta en el mapa, necesitamos los pasos con coordenadas
-          const steps = route.legs[0].steps.map(step => ({
-            startLocation: step.start_location,  // Coordenada de inicio del paso
-            endLocation: step.end_location,      // Coordenada de finalización del paso
-            instructions: step.html_instructions // Instrucciones del paso
-          }));
-
+      
+          // Se toma la primera ruta encontrada
+          const route = routeData.routes[0];
+          const totalDistance = route.legs.reduce((acc, leg) => acc + leg.distance.value, 0);  // Distancia total
+          const totalTime = route.legs.reduce((acc, leg) => acc + leg.duration.value, 0);      // Tiempo total en segundos
+      
+          // Extraemos los pasos (steps) de todas las "legs"
+          const steps = route.legs.flatMap(leg =>
+            leg.steps.map(step => ({
+              startLocation: step.start_location,  // Coordenada de inicio del paso
+              endLocation: step.end_location,      // Coordenada de finalización del paso
+              instructions: step.html_instructions // Instrucciones del paso
+            }))
+          );
+      
           console.log(`✅ Ruta encontrada para conductor ${driver.id}:`, route);
 
           
           ruta = route;
+          const requestTime = new Date().toISOString(); // Formato 'YYYY-MM-DDTHH:mm:ss.sssZ'
           // Preparamos la respuesta para enviar
           try {
             const messageData = {
@@ -140,6 +148,7 @@ module.exports = {
               origin: desde,
               destinationAdress: direccionHasta,
               originAdress: direccionDesde,
+              requestTime: requestTime,
               message: `¡Nuevo viaje! Distancia estimada: ${totalDistance / 1000} km, Tiempo estimado: ${totalTime / 60} minutos.`,  // Tiempo añadido al mensaje
             };
 

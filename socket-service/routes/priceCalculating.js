@@ -10,7 +10,7 @@ router.post('/price-calculating', async (req, res) => {
             return res.status(400).json({ error: 'La distancia debe ser un número válido y mayor o igual a 0' });
         }
 
-        const price = (distance/1000) * 4.28;
+        const price = (distance/1000) * 10.1;
 
         return res.json({ price });
     } catch (error) {

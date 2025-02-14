@@ -6,7 +6,7 @@ const axios = require('axios');
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 router.post('/trip-request', async (req, res) => {
-    const { driverId, message, prueba, totalDistance, totalTime, price, origin, driverCoords, destination, destinationAdress, originAdress, route } = req.body;
+    const { driverId, message, prueba, totalDistance, totalTime, price, origin, driverCoords, destination, destinationAdress, originAdress, requestTime, route } = req.body;
 
     if (!driverId || !message) {
         return res.status(400).json({ error: 'Faltan los datos requeridos (driverId, message)' });
@@ -15,7 +15,7 @@ router.post('/trip-request', async (req, res) => {
     try {
         // Obtener `io` desde el `app` principal
         const io = req.app.get('io');
-        io.emit('mensajeConductor', { driverId, message, prueba, price, origin, totalDistance, totalTime, driverCoords, destination, destinationAdress, originAdress, route });
+        io.emit('trip-request', { driverId, message, prueba, price, origin, totalDistance, totalTime, driverCoords, destination, destinationAdress, originAdress, requestTime, route });
 
         console.log(`✅ Mensaje enviado al conductor ${driverId}: ${message} ${prueba}`);
         return res.status(200).json({ message: 'Mensaje enviado al conductor' });
