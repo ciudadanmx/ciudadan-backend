@@ -33,6 +33,14 @@ app.use('/', sendMessageRoute);
 io.on('connection', (socket) => {
   console.log('✅ Cliente conectado a WebSocket');
 
+  // Escuchar el evento 'speakTTS' para enviar el texto recibido
+  socket.on('speakTTS', (message) => {
+    console.log("Texto recibido para TTS:", message);
+    
+    // Enviar el mismo mensaje de vuelta al mismo cliente
+    socket.emit('speakTTS', message);
+  });
+
   socket.on('disconnect', () => {
     console.log('❌ Cliente desconectado de WebSocket');
   });
