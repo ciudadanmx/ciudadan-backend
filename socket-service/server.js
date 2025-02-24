@@ -6,6 +6,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const aaccept = `${process.env.SOCKET_HOST}:${process.env.SOCKET_HOST}`;
 const accept = process.env.CORS_ORIGIN;
+//const { getLlmResponse } = require("./lmai");
 
 const app = express();
 const server = http.createServer(app);
@@ -31,19 +32,18 @@ app.use('/', sendMessageRoute);
 
 // Manejo de WebSocket
 io.on('connection', (socket) => {
-  console.log('✅ Cliente conectado a WebSocket');
+    console.log("✅ Cliente conectado a WebSocket:", socket.id);
 
-  // Escuchar el evento 'speakTTS' para enviar el texto recibido
-  socket.on('speakTTS', (message) => {
-    console.log("Texto recibido para TTS:", message);
-    
-    // Enviar el mismo mensaje de vuelta al mismo cliente
-    socket.emit('speakTTS', message);
-  });
+    socket.on('speakTTS', (message) => {
+        console.log("📢 Servidor recibió 'speakTTS' con mensaje:", message);
 
-  socket.on('disconnect', () => {
-    console.log('❌ Cliente desconectado de WebSocket');
-  });
+        // Emitir el mensaje a TODOS los clientes conectados (incluyendo el que lo envió)
+        io.emit('speakTTS', message);
+    });
+
+    socket.on('disconnect', () => {
+        console.log("❌ Cliente desconectado:", socket.id);
+    });
 });
 
 // Iniciar servidor
